@@ -1,0 +1,23 @@
+{
+"type": "FeatureCollection",
+"name": "repair_station",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Name": "Alps Village Kroger" }, "geometry": { "type": "Point", "coordinates": [ -83.4077534, 33.946965, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Athens Orthopedic Clinic-Urgent Care" }, "geometry": { "type": "Point", "coordinates": [ -83.396808, 33.961104200000079, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Boulevard Woods Park" }, "geometry": { "type": "Point", "coordinates": [ -83.385319699999968, 33.965387500000077, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "College Avenue Parking Deck" }, "geometry": { "type": "Point", "coordinates": [ -83.375930199999971, 33.958980900000029, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Center for Applied Genetic Technologies" }, "geometry": { "type": "Point", "coordinates": [ -83.362245199999961, 33.931493, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Dudley Park" }, "geometry": { "type": "Point", "coordinates": [ -83.367229499999951, 33.955769700000076, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Miller Learning Center" }, "geometry": { "type": "Point", "coordinates": [ -83.376597299999958, 33.951459, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Myers Quad" }, "geometry": { "type": "Point", "coordinates": [ -83.376339599999937, 33.946305600000073, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "North Oconee River Greenway Parking" }, "geometry": { "type": "Point", "coordinates": [ -83.37743439999997, 33.970374200000037, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "East Campus Connector" }, "geometry": { "type": "Point", "coordinates": [ -83.365036299999986, 33.94104070000003, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Plant Sciences" }, "geometry": { "type": "Point", "coordinates": [ -83.375132, 33.941876, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Ramsey Center" }, "geometry": { "type": "Point", "coordinates": [ -83.370558199999948, 33.937854100000038, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Sandy Creek Nature Center" }, "geometry": { "type": "Point", "coordinates": [ -83.382312399999989, 33.986988200000042, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Trail Creek North Trailhead" }, "geometry": { "type": "Point", "coordinates": [ -83.361210799999981, 33.967267600000071, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "UGA Main Library" }, "geometry": { "type": "Point", "coordinates": [ -83.373406499999987, 33.954633600000079, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Walker Park Upper Parking Lot" }, "geometry": { "type": "Point", "coordinates": [ -83.355406499999958, 33.967538, 0.0 ] } }
+]
+}

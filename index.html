@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cyclist Survival Map of Athens</title>
+  <link rel="icon" type="image/png" href="image/bike_athens_icon.png" />
+  <link rel="stylesheet" href="https://js.arcgis.com/4.31/esri/themes/dark/main.css" />
+  <script src="https://js.arcgis.com/4.31/"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* ── Mobile gate ── */
+    #mobile-gate {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #0e0c0a;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 52px 40px;
+    }
+
+    #mobile-gate .eyebrow {
+      font-size: 9px;
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      color: #4a4640;
+      margin-bottom: 28px;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+
+    #mobile-gate .main-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: #e2dcd2;
+      line-height: 1.18;
+      letter-spacing: -0.4px;
+      margin-bottom: 20px;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+
+    #mobile-gate .note {
+      font-size: 13px;
+      line-height: 1.8;
+      color: #5a5650;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+
+    @media (max-width: 768px) {
+      #mobile-gate {
+        display: flex;
+      }
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: #0e0c0a;
+    }
+
+    /* ── Map pane — left side ── */
+    #map-pane {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 540px;
+      bottom: 0;
+    }
+
+    #viewDiv {
+      width: 100%;
+      height: 100%;
+      background: #252220;
+    }
+
+    /* ── Static image overlay (scene 9) ── */
+    #static-overlay {
+      position: absolute;
+      inset: 0;
+      background: #0e0c0a;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #static-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #static-overlay img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    /* ── Story pane — right side, scrollable ── */
+    #story-pane {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 540px;
+      height: 100vh;
+      overflow-y: scroll;
+      scrollbar-width: thin;
+      scrollbar-color: #2a2825 transparent;
+      z-index: 10;
+    }
+
+    #story-pane::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    #story-pane::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    #story-pane::-webkit-scrollbar-thumb {
+      background: #2a2825;
+      border-radius: 2px;
+    }
+
+    .scene {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 72px 52px;
+      background: rgba(10, 8, 6, 0.92);
+      border-left: 1px solid #1a1815;
+    }
+
+    /* ── Typography ── */
+    .scene .eyebrow {
+      font-size: 11px;
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      color: #4a4640;
+      margin-bottom: 18px;
+    }
+
+    .scene .main-title {
+      font-size: 34px;
+      font-weight: 700;
+      color: #e2dcd2;
+      line-height: 1.15;
+      letter-spacing: -0.5px;
+      margin-bottom: 24px;
+    }
+
+    .scene .scene-head {
+      font-size: 22px;
+      font-weight: 700;
+      color: #d4cbbf;
+      line-height: 1.2;
+      letter-spacing: -0.3px;
+      margin-bottom: 18px;
+    }
+
+    .scene .scene-body {
+      font-size: 16px;
+      line-height: 1.85;
+      color: #6a6460;
+    }
+
+    .scene .scene-body+.scene-body {
+      margin-top: 14px;
+    }
+
+    /* ── Nav dots ── */
+    #nav-dots {
+      position: fixed;
+      right: 528px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 20;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #2a2825;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+    }
+
+    .dot.active {
+      background: #c8b882;
+      transform: scale(1.4);
+    }
+
+    /* ── Scroll progress bar ── */
+    #scroll-bar {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 540px;
+      height: 2px;
+      background: #1a1815;
+      z-index: 30;
+    }
+
+    #scroll-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #c8b882;
+      transition: width 0.1s linear;
+    }
+
+    /* ── Download button ── */
+    .download-btn {
+      display: inline-block;
+      margin-top: 28px;
+      padding: 11px 22px;
+      border: 1px solid #3a3632;
+      color: #c8b882;
+      font-size: 11px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      background: transparent;
+      transition: border-color 0.25s, color 0.25s;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+
+    .download-btn:hover {
+      border-color: #c8b882;
+      color: #e2dcd2;
+    }
+
+    /* ── Metadata block ── */
+    .metadata {
+      margin-top: 36px;
+      padding-top: 22px;
+      border-top: 1px solid #1e1c19;
+    }
+
+    .metadata p {
+      font-size: 11px;
+      line-height: 2;
+      color: #3a3632;
+      letter-spacing: 0.3px;
+    }
+
+    /* ── ArcGIS UI overrides ── */
+    .esri-ui-top-left {
+      top: 16px !important;
+      left: 16px !important;
+    }
+
+    .esri-ui-bottom-left {
+      bottom: 24px !important;
+      left: 16px !important;
+    }
+
+    .esri-zoom,
+    .esri-home,
+    .esri-compass {
+      background: rgba(14, 12, 10, 0.85) !important;
+      border: 1px solid #2a2825 !important;
+    }
+
+    .esri-widget--button {
+      color: #a09880 !important;
+    }
+
+    .esri-widget--button:hover {
+      background: #1a1815 !important;
+      color: #e2dcd2 !important;
+    }
+
+    .esri-scale-bar__label {
+      color: #6a6460 !important;
+      font-size: 10px !important;
+    }
+
+    .esri-scale-bar__line--bottom {
+      border-color: #4a4640 !important;
+    }
+
+    .esri-ui-top-right {
+      top: 16px !important;
+      right: 16px !important;
+    }
+
+    .esri-compass .esri-widget--button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .compass-svg {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Mobile gate -->
+  <div id="mobile-gate">
+    <p class="eyebrow">Cyclist Survival Map</p>
+    <p class="main-title">This map is designed for desktop viewing.</p>
+    <p class="note">Please open it on a laptop or desktop computer for the full experience.</p>
+  </div>
+
+  <!-- Nav dots -->
+  <nav id="nav-dots">
+    <div class="dot active" data-target="0"></div>
+    <div class="dot" data-target="1"></div>
+    <div class="dot" data-target="2"></div>
+    <div class="dot" data-target="3"></div>
+    <div class="dot" data-target="4"></div>
+    <div class="dot" data-target="5"></div>
+    <div class="dot" data-target="6"></div>
+    <div class="dot" data-target="7"></div>
+    <div class="dot" data-target="8"></div>
+    <div class="dot" data-target="9"></div>
+  </nav>
+
+  <!-- Scroll progress bar -->
+  <div id="scroll-bar">
+    <div id="scroll-bar-fill"></div>
+  </div>
+
+  <!-- Map pane -->
+  <div id="map-pane">
+    <div id="viewDiv"></div>
+    <div id="static-overlay">
+      <img src="image/bike_athens_full.png" alt="Cyclist Survival Map of Athens (print)" />
+    </div>
+  </div>
+
+  <!-- Story pane -->
+  <div id="story-pane">
+
+    <!-- Scene 0 — Title -->
+    <section class="scene" data-scene="0">
+      <p class="eyebrow">Athens, Georgia</p>
+      <h1 class="main-title">Cyclist<br>Survival Map</h1>
+      <p class="scene-body">A different way of seeing the city — one road at a time, from the saddle.</p>
+      <p class="scene-body">Scroll to explore.</p>
+    </section>
+
+    <!-- Scene 1 — The familiar map -->
+    <section class="scene" data-scene="1">
+      <p class="eyebrow">01 — Starting point</p>
+      <h2 class="scene-head">The map you already know</h2>
+      <p class="scene-body">A conventional road map of Athens. Roads are ranked by traffic volume. Arterials dominate.
+        Bike infrastructure is present but subdued — easy to miss, easy to ignore.</p>
+      <p class="scene-body">This is how most people see the city.</p>
+    </section>
+
+    <!-- Scene 2 — A different measure -->
+    <section class="scene" data-scene="2">
+      <p class="eyebrow">02 — Inversion</p>
+      <h2 class="scene-head">A different measure</h2>
+      <p class="scene-body">Flip the hierarchy. Roads are now rendered by how safe they feel on a bike — quiet,
+        low-traffic streets glow brightest. Major arterials recede into darkness.</p>
+      <p class="scene-body">The city rearranges itself.</p>
+    </section>
+
+    <!-- Scene 3 — College Avenue -->
+    <section class="scene" data-scene="3">
+      <p class="eyebrow">03 — Downtown</p>
+      <h2 class="scene-head">College Avenue</h2>
+      <p class="scene-body">The spine of downtown Athens. High foot traffic, dense intersections, and no dedicated bike
+        infrastructure make College Avenue one of the most stressful corridors for cyclists in the city.</p>
+      <p class="scene-body">Highlighted in amber — a caution, not a route.</p>
+    </section>
+
+    <!-- Scene 4 — Two bridges -->
+    <section class="scene" data-scene="4">
+      <p class="eyebrow">04 — River crossings</p>
+      <h2 class="scene-head">Two bridges</h2>
+      <p class="scene-body">The North Oconee River bisects the west side of Athens. Of the bridges that cross it, most
+        lack safe accommodations for cyclists — no shoulder, no shared path, high-speed traffic.</p>
+      <p class="scene-body">Marked crossings are effectively inaccessible by bike.</p>
+    </section>
+
+    <!-- Scene 5 — Park connectors -->
+    <section class="scene" data-scene="5">
+      <p class="eyebrow">05 — Southeast Athens</p>
+      <h2 class="scene-head">Park connectors</h2>
+      <p class="scene-body">Southeast Athens holds several parks and greenways. A handful of quieter arterials thread
+        between them — potential connectors that remain underused and underlit.</p>
+      <p class="scene-body">The network is there, waiting to be activated.</p>
+    </section>
+
+    <!-- Scene 6 — Bike network -->
+    <section class="scene" data-scene="6">
+      <p class="eyebrow">06 — Infrastructure</p>
+      <h2 class="scene-head">The bike network</h2>
+      <p class="scene-body">Strip away the roads. What remains is Athens's dedicated cycling infrastructure — shared-use
+        paths in gold, painted bike lanes slightly dimmer.</p>
+      <p class="scene-body">Coverage is real but uneven. Large swaths of the city remain without any dedicated
+        provision.</p>
+    </section>
+
+    <!-- Scene 7 — What the map reveals -->
+    <section class="scene" data-scene="7">
+      <p class="eyebrow">07 — Reading the map</p>
+      <h2 class="scene-head">What the map reveals</h2>
+      <p class="scene-body">Bright areas are where cyclists feel at home. Dark corridors are where they hold their
+        breath. The contrast is not subtle — it is the everyday geography of risk.</p>
+      <p class="scene-body">Urban cycling infrastructure is not just about convenience. It is about who gets to move
+        freely, and who does not.</p>
+    </section>
+
+    <!-- Scene 8 — Swipe -->
+    <section class="scene" data-scene="8">
+      <p class="eyebrow">08 — Comparison</p>
+      <h2 class="scene-head">Two maps, one city</h2>
+      <p class="scene-body">Drag the divider to compare. Left: the conventional car-centered map. Right: the cyclist's
+        map.</p>
+      <p class="scene-body">Same streets. Different stories.</p>
+    </section>
+
+    <!-- Scene 9 — Static / print map -->
+    <section class="scene" data-scene="9">
+      <p class="eyebrow">09 — Print edition</p>
+      <h2 class="scene-head">The full map</h2>
+      <p class="scene-body">A print-ready version of the cyclist survival map, designed for posting, sharing, and
+        advocacy.</p>
+      <a class="download-btn" href="image/bike_athens_full.png" download="bike_athens_map.png">Download full map ↓</a>
+      <div class="metadata">
+        <p>Data: OpenStreetMap · Athens-Clarke County GIS</p>
+        <p>Projection: Azimuthal Equidistant, centered on Athens, GA</p>
+        <p>Author: Atlas Guo · 2025 · CartoGuophy.com</p>
+      </div>
+    </section>
+
+  </div><!-- /story-pane -->
+
+  <script src="js/map-config.js"></script>
+  <script src="js/storymap.js"></script>
+</body>
+
+</html>
