@@ -72,18 +72,6 @@ require([
     view.ui.add(home,     { position: "top-left",  index: 1 });
     view.ui.add(compass,  { position: "top-right", index: 0 });
     view.ui.add(scaleBar, { position: "bottom-left" });
-
-    // Replace compass icon with a custom SVG arrow
-    compass.when(function () {
-      var btn = compass.container && compass.container.querySelector
-        ? compass.container.querySelector('.esri-widget--button')
-        : document.querySelector('.esri-compass .esri-widget--button');
-      if (!btn) return;
-      btn.innerHTML =
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="18" height="18" class="compass-svg">' +
-          '<polygon points="16,4 22,22 16,18 10,22" fill="#c8b882"/>' +
-        '</svg>';
-    });
   });
 
   var highlightLayer = new GraphicsLayer({ effect: FX.hlLayer });
@@ -109,8 +97,8 @@ require([
 
   // Load order (bottom → top):
   //   parks → UGA → water → shadows (C,B,A) → roads → swipe road (hidden)
-  //   → bike path → bike lane → repair → mask → boundary → highlight
-  //   + two hidden car-centered bike layers for swipe leading side (13, 14)
+  //   → bike path → bike lane → repair → mask → boundary halo → boundary → highlight
+  //   + two hidden car-centered bike layers for swipe leading side (14, 15)
   Promise.all([
     makeLayer("data/park_athens.geojson",      L.park),            // 0
     makeLayer("data/uga_athens.geojson",        L.uga),             // 1
@@ -124,9 +112,10 @@ require([
     makeLayer("data/bike_lane.geojson",         L.bikeLane),        // 9
     makeLayer("data/repair_station.geojson",    L.repair),          // 10
     makeLayer("data/athens_mask.geojson",       L.mask),            // 11
-    makeLayer("data/athens.geojson",            L.boundary),        // 12
-    makeLayer("data/bike_path.geojson",         Object.assign({}, L.bikePathNormal, { visible: false })), // 13 swipe car bike path
-    makeLayer("data/bike_lane.geojson",         Object.assign({}, L.bikeLaneNormal, { visible: false }))  // 14 swipe car bike lane
+    makeLayer("data/athens.geojson",            L.boundaryHalo),    // 12
+    makeLayer("data/athens.geojson",            L.boundary),        // 13
+    makeLayer("data/bike_path.geojson",         Object.assign({}, L.bikePathNormal, { visible: false })), // 14 swipe car bike path
+    makeLayer("data/bike_lane.geojson",         Object.assign({}, L.bikeLaneNormal, { visible: false }))  // 15 swipe car bike lane
   ]).then(function (layers) {
     roadLayer          = layers[6];
     roadSwipeLayer     = layers[7];
@@ -136,8 +125,8 @@ require([
     shadowB            = layers[4];
     shadowC            = layers[3];
     repairLayer        = layers[10];
-    bikePathSwipeLayer = layers[13];
-    bikeLaneSwipeLayer = layers[14];
+    bikePathSwipeLayer = layers[14];
+    bikeLaneSwipeLayer = layers[15];
 
     layers.forEach(function (lyr) { map.add(lyr); });
     map.add(highlightLayer);
@@ -242,14 +231,15 @@ require([
   function s4() {
     setInverted(); restoreOpacity(); clearHL();
     view.goTo({ center: [-83.413, 33.9435], scale: 22000 }, FLY).then(function () {
-      // Approximate locations of bridges over North Oconee River
-      var bridges = [[-83.4184, 33.9450], [-83.3960, 33.9202]];
+      // Road-river crossings over the Middle Oconee River
+      var bridgeRed = [235, 68, 68];
+      var bridges = [[-83.42295, 33.94690], [-83.39013, 33.91855]];
       bridges.forEach(function (coords) {
         var geo = { type: "point", longitude: coords[0], latitude: coords[1] };
         // Circle ring
-        highlightLayer.add(new Graphic({ geometry: geo, symbol: { type: "simple-marker", style: "circle", color: [0,0,0,0], size: 26, outline: { color: [PAL.highlight[0],PAL.highlight[1],PAL.highlight[2],0.85], width: 2.5 } } }));
+        highlightLayer.add(new Graphic({ geometry: geo, symbol: { type: "simple-marker", style: "circle", color: [0,0,0,0], size: 26, outline: { color: [bridgeRed[0],bridgeRed[1],bridgeRed[2],0.9], width: 2.5 } } }));
         // X mark — signals "inaccessible"
-        highlightLayer.add(new Graphic({ geometry: geo, symbol: { type: "simple-marker", style: "x",      color: [PAL.highlight[0],PAL.highlight[1],PAL.highlight[2],0.9],  size: 11, outline: { color: [PAL.highlight[0],PAL.highlight[1],PAL.highlight[2],0.9], width: 2 } } }));
+        highlightLayer.add(new Graphic({ geometry: geo, symbol: { type: "simple-marker", style: "x",      color: [bridgeRed[0],bridgeRed[1],bridgeRed[2],0.95],  size: 11, outline: { color: [bridgeRed[0],bridgeRed[1],bridgeRed[2],0.95], width: 2 } } }));
       });
     });
   }

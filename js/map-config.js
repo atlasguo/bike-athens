@@ -51,11 +51,11 @@
     bikeGreenLane: [76,  114, 52],
 
     // Polygon fills — calibrated to static image
-    park:       [22,  34,  7],    // deep dark olive-green
+    park:       [29,  35,  20],    // deep dark olive-green
     parkEdge:   [32,  48,  10],
-    uga:        [32,  30,  28],   // very dark neutral, recedes into background
+    uga:        [32,  25,  20],   // very dark neutral, recedes into background
     ugaEdge:    [48,  46,  44],
-    water:      [12,  34,  52],   // deep dark teal-blue
+    water:      [22,  35,  52],   // deep dark teal-blue
 
     // Boundary / exterior mask
     boundary:   [208, 192, 155],  // warm ochre-cream Athens edge
@@ -67,7 +67,8 @@
 
     // Label text + halo
     roadLabel:  [148, 143, 136],
-    waterLabel: [52,  104, 82],
+    parkLabel:  [118, 142, 86],
+    waterLabel: [66,  118, 150],
     repairLbl:  [232, 200, 64],
     labelHalo:  [10,  8,   6],
 
@@ -84,16 +85,16 @@
 
     inv: {
       // Tier A  >80 km/h
-      Amain: 0.8,  Alink: 0.6,
+      Amain: 0.6,  Alink: 0.45,
       // Tier B  60–80 km/h
-      Bmain: 1.2,  Blink: 0.9,
+      Bmain: 0.9,  Blink: 0.7,
       // Tier C  40–60 km/h
-      Cmain: 1.8,  Clink: 1.2,  CtLink: 1.0,
+      Cmain: 1.35, Clink: 0.9,  CtLink: 0.75,
       // Tier D  20–40 km/h
-      Dmain: 1.5,  Duncl: 1.2,
+      Dmain: 1.15, Duncl: 0.9,
       // Tier E  ≤20 km/h
-      Eres:  2.0,  Elive: 1.6,  Etrack: 1.0,
-      def:   1.8
+      Eres:  1.5,  Elive: 1.2,  Etrack: 0.75,
+      def:   1.35
     },
 
     norm: {
@@ -113,12 +114,13 @@
     lane:      2.0,
 
     water:     3.5,
-    boundary:  1.5,
+    boundary:  2,
+    boundaryHalo: 5,
 
     // Black halo underlays beneath fast roads (Tier A largest → Tier C smallest)
-    shadowA:   14,
-    shadowB:   8,
-    shadowC:   4,
+    shadowA:   10,
+    shadowB:   6,
+    shadowC:   3,
   };
 
   // ════════════════════════════════════════════════════════════
@@ -145,8 +147,10 @@
   // ════════════════════════════════════════════════════════════
   var LBL = {
     roadMinScale:   25000,
+    parkMinScale:   30000,
     repairMinScale: 25000,
     roadSize:    9,
+    parkSize:    9,
     waterSize:   9,
     repairSize:  9.5,
     haloSize:    1.5,
@@ -259,6 +263,19 @@
 
     park: {
       popupEnabled: false,
+      labelsVisible: true,
+      labelingInfo: [{
+        labelExpressionInfo: { expression: "$feature.Park_Name" },
+        symbol: {
+          type: "text",
+          color: c(PAL.parkLabel, 0.9),
+          haloColor: c(PAL.labelHalo, 0.9),
+          haloSize: LBL.haloSize,
+          font: { family: "Arial", size: LBL.parkSize, style: "italic" }
+        },
+        minScale: LBL.parkMinScale,
+        where: "Park_Name IS NOT NULL AND Park_Name <> ''"
+      }],
       customParameters: { layerTag: "park" },
       renderer: {
         type: "simple",
@@ -374,7 +391,15 @@
       popupEnabled: false,
       renderer: {
         type: "simple",
-        symbol: { type: "simple-fill", color: [0,0,0,0], outline: { color: c(PAL.boundary, 0.90), width: W.boundary } }
+        symbol: { type: "simple-fill", color: [0,0,0,0], outline: { color: c(PAL.boundary, 0.90), width: W.boundary, style: "dash" } }
+      }
+    },
+
+    boundaryHalo: {
+      popupEnabled: false,
+      renderer: {
+        type: "simple",
+        symbol: { type: "simple-fill", color: [0,0,0,0], outline: { color: c(PAL.boundary, 0.28), width: W.boundaryHalo } }
       }
     },
 
