@@ -62,14 +62,14 @@
     mask:       [10,  8,   6],    // near-black outside Athens boundary
 
     // Repair station marker
-    repairFill:    [232, 200, 64],
+    repairFill:    [238, 142, 48],
     repairOutline: [240, 236, 224],
 
     // Label text + halo
     roadLabel:  [148, 143, 136],
     parkLabel:  [118, 142, 86],
     waterLabel: [66,  118, 150],
-    repairLbl:  [232, 200, 64],
+    repairLbl:  [238, 142, 48],
     labelHalo:  [10,  8,   6],
 
     // Storymap highlight colour
@@ -146,7 +146,6 @@
   //    (lower scale number = more zoomed-in)
   // ════════════════════════════════════════════════════════════
   var LBL = {
-    roadMinScale:   25000,
     parkMinScale:   30000,
     repairMinScale: 25000,
     roadSize:    9,
@@ -239,22 +238,23 @@
   // ════════════════════════════════════════════════════════════
 
   var roadLabelInfo = [{
-    labelExpressionInfo: { expression: "$feature.name" },
+    labelExpressionInfo: {
+      expression: "IIf(IsEmpty($feature.name), '', $feature.name)"
+    },
+    labelPlacement: "above-along",
     symbol: {
       type: "text",
       color: c(PAL.roadLabel, 0.85),
       haloColor: c(PAL.labelHalo, 0.9),
       haloSize: LBL.haloSize,
       font: { family: "Arial", size: LBL.roadSize }
-    },
-    minScale: LBL.roadMinScale,
-    where: "name IS NOT NULL AND name <> ''"
+    }
   }];
 
   var layerOpts = {
 
     roads: {
-      labelsVisible: true,
+      labelsVisible: false,
       labelingInfo: roadLabelInfo,
       effect: FX.roadInv,
       renderer: invertedRenderer,
@@ -411,12 +411,12 @@
       renderer: {
         type: "unique-value",
         field: "Type",
-        defaultSymbol: sl(PAL.bikeGreenPath, 0.65, 1.2),
+        defaultSymbol: sl(PAL.bikeGreenPath, 0.65, 0.8),
         uniqueValueInfos: [
-          { value: "Multi-use Trail",   symbol: sl(PAL.bikeGreenPath, 0.72, 1.4) },
-          { value: "Multi-use Path",    symbol: sl(PAL.bikeGreenPath, 0.72, 1.4) },
-          { value: "Off-Road Facility", symbol: sl(PAL.bikeGreenPath, 0.60, 1.0) },
-          { value: "Sharrows",          symbol: { type: "simple-line", color: c(PAL.bikeGreenPath, 0.40), width: 0.8, style: "short-dash" } }
+          { value: "Multi-use Trail",   symbol: sl(PAL.bikeGreenPath, 0.72, 1.0) },
+          { value: "Multi-use Path",    symbol: sl(PAL.bikeGreenPath, 0.72, 1.0) },
+          { value: "Off-Road Facility", symbol: sl(PAL.bikeGreenPath, 0.60, 0.7) },
+          { value: "Sharrows",          symbol: { type: "simple-line", color: c(PAL.bikeGreenPath, 0.40), width: 0.5, style: "short-dash" } }
         ]
       }
     },
@@ -427,7 +427,7 @@
       blendMode: "normal",
       renderer: {
         type: "simple",
-        symbol: { type: "simple-line", color: c(PAL.bikeGreenLane, 0.38), width: 0.7, style: "short-dot" }
+        symbol: { type: "simple-line", color: c(PAL.bikeGreenLane, 0.38), width: 0.45, style: "short-dot" }
       }
     },
 
