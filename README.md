@@ -4,4 +4,6 @@ An interactive story map about bicycle infrastructure and street hierarchy in At
 
 The project reframes Athens' street network from a cyclist's perspective, contrasting conventional road hierarchy with bike-centered mobility, repair access, parks, waterways, and local cycling infrastructure.
 
+View the interactive storymap: <http://cartoguophy.com/bike-athens/>
+
 View the static map: <https://cartoguophy.com/maps/bike_athens.html>
