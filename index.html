@@ -82,6 +82,126 @@
       width: 100%;
       height: 100%;
       background: #252220;
+      transition: filter 0.8s ease, opacity 0.8s ease;
+    }
+
+    #viewDiv.map-blurred {
+      filter: blur(6px);
+      opacity: 0.35;
+    }
+
+    /* ── Scroll hint fixed to bottom of right panel ── */
+    .scene-scroll-hint {
+      position: absolute;
+      bottom: 72px;
+      left: 0;
+      right: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0.72;
+    }
+
+    .scene-scroll-up {
+      position: absolute;
+      top: 48px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      opacity: 0.55;
+      cursor: pointer;
+    }
+
+    .scene-scroll-up__cue {
+      position: relative;
+      width: 40px;
+      height: 60px;
+      animation: scrollCueUp 1.8s ease-in-out infinite;
+    }
+
+    .scene-scroll-up__cue::before,
+    .scene-scroll-up__cue::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      width: 22px;
+      height: 22px;
+      border-left: 2.5px solid #c8b882;
+      border-top: 2.5px solid #c8b882;
+      transform: translateX(-50%) rotate(45deg);
+    }
+
+    .scene-scroll-up__cue::before {
+      bottom: 4px;
+      opacity: 0.4;
+    }
+
+    .scene-scroll-up__cue::after {
+      bottom: 24px;
+    }
+
+    @keyframes scrollCueUp {
+
+      0%,
+      100% {
+        transform: translateY(0);
+        opacity: 0.5;
+      }
+
+      50% {
+        transform: translateY(-12px);
+        opacity: 1;
+      }
+    }
+
+    /* hide all ArcGIS UI controls on scene 0 */
+    #map-pane:has(#viewDiv.map-blurred) .esri-ui {
+      visibility: hidden;
+    }
+
+    /* disable map interaction on scene 0 */
+    #viewDiv.map-blurred {
+      pointer-events: none;
+    }
+
+    .scene-scroll-hint__text {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 11px;
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      color: #c8b882;
+      white-space: nowrap;
+    }
+
+    /* down-pointing animated arrow */
+    .scene-scroll-hint__cue {
+      position: relative;
+      width: 40px;
+      height: 60px;
+      animation: scrollCue 1.8s ease-in-out infinite;
+    }
+
+    .scene-scroll-hint__cue::before,
+    .scene-scroll-hint__cue::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      width: 22px;
+      height: 22px;
+      border-right: 2.5px solid #c8b882;
+      border-bottom: 2.5px solid #c8b882;
+      transform: translateX(-50%) rotate(45deg);
+    }
+
+    .scene-scroll-hint__cue::before {
+      top: 4px;
+      opacity: 0.4;
+    }
+
+    .scene-scroll-hint__cue::after {
+      top: 24px;
     }
 
     /* ── Static image overlay (scene 9) ── */
@@ -150,15 +270,15 @@
 
     /* ── Typography ── */
     .scene .eyebrow {
-      font-size: 12px;
+      font-size: 13px;
       letter-spacing: 3.5px;
       text-transform: uppercase;
-      color: #9e947e;
+      color: #c8b882;
       margin-bottom: 18px;
     }
 
     .scene .main-title {
-      font-size: 34px;
+      font-size: 38px;
       font-weight: 700;
       color: #e2dcd2;
       line-height: 1.15;
@@ -167,7 +287,7 @@
     }
 
     .scene .scene-head {
-      font-size: 22px;
+      font-size: 25px;
       font-weight: 700;
       color: #d4cbbf;
       line-height: 1.2;
@@ -176,7 +296,7 @@
     }
 
     .scene .scene-body {
-      font-size: 16px;
+      font-size: 18px;
       line-height: 1.85;
       color: #6a6460;
     }
@@ -185,35 +305,32 @@
       margin-top: 14px;
     }
 
-    .scroll-cue {
+    .scene .scene-list {
+      list-style: none;
+      margin-top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .scene .scene-list li {
+      font-size: 18px;
+      line-height: 1.7;
+      color: #6a6460;
+      padding-left: 18px;
+      position: relative;
+    }
+
+    .scene .scene-list li::before {
+      content: "▸";
       position: absolute;
-      left: 52px;
-      bottom: 36px;
-      width: 22px;
-      height: 34px;
-      opacity: 0.72;
-      animation: scrollCue 1.8s ease-in-out infinite;
+      left: 0;
+      color: #c8b882;
     }
 
-    .scroll-cue::before,
-    .scroll-cue::after {
-      content: "";
-      position: absolute;
-      left: 50%;
-      width: 12px;
-      height: 12px;
-      border-right: 1.5px solid #c8b882;
-      border-bottom: 1.5px solid #c8b882;
-      transform: translateX(-50%) rotate(45deg);
-    }
-
-    .scroll-cue::before {
-      top: 2px;
-      opacity: 0.45;
-    }
-
-    .scroll-cue::after {
-      top: 13px;
+    .scene .scene-list li strong {
+      color: #d4cbbf;
+      font-weight: 600;
     }
 
     @keyframes scrollCue {
@@ -221,12 +338,12 @@
       0%,
       100% {
         transform: translateY(0);
-        opacity: 0.56;
+        opacity: 0.5;
       }
 
       50% {
-        transform: translateY(7px);
-        opacity: 0.95;
+        transform: translateY(12px);
+        opacity: 1;
       }
     }
 
@@ -296,7 +413,7 @@
       padding: 11px 22px;
       border: 1px solid #3a3632;
       color: #c8b882;
-      font-size: 11px;
+      font-size: 13px;
       letter-spacing: 2.5px;
       text-transform: uppercase;
       text-decoration: none;
@@ -319,7 +436,7 @@
     }
 
     .metadata p {
-      font-size: 13px;
+      font-size: 15px;
       line-height: 2;
       color: #9a9287;
       letter-spacing: 0.3px;
@@ -355,6 +472,125 @@
     .esri-widget--button:hover,
     .esri-widget--button:focus {
       color: #e2dcd2 !important;
+    }
+
+    .north-compass {
+      position: relative !important;
+      width: 76px !important;
+      height: 76px !important;
+      border: 0 !important;
+      border-radius: 50% !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      overflow: visible !important;
+      transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease !important;
+    }
+
+    .north-compass:hover,
+    .north-compass:focus-visible {
+      background: transparent !important;
+      box-shadow: none !important;
+      outline: none;
+      transform: scale(1.02);
+    }
+
+    .north-compass:focus-visible {
+      box-shadow: none !important;
+    }
+
+    .north-compass__rotor {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      display: block;
+      width: 62px;
+      height: 62px;
+      transition: transform 0.25s ease;
+      transform: translate(-50%, -50%);
+      transform-origin: center;
+    }
+
+    .north-compass__wheel {
+      position: absolute;
+      inset: 4px;
+      display: block;
+      border: 2px solid #e8e2b8;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle, transparent 0 6px, rgba(232, 226, 184, 0.22) 6px 7px, transparent 7px),
+        repeating-conic-gradient(from 0deg,
+          rgba(232, 232, 224, 0.82) 0deg 1.5deg,
+          transparent 1.5deg 18deg);
+      box-shadow:
+        inset 0 0 0 1px #272724,
+        inset 0 0 0 3px rgba(232, 226, 184, 0.72),
+        0 0 5px rgba(232, 226, 184, 0.22);
+    }
+
+    .north-compass__hub {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 10px;
+      height: 10px;
+      border: 1px solid #dfc72f;
+      border-radius: 50%;
+      background: #343330;
+      box-shadow: 0 0 0 1px #343330;
+      transform: translate(-50%, -50%);
+      z-index: 4;
+    }
+
+    .north-compass__needle {
+      position: absolute;
+      inset: -2px 0;
+      display: block;
+      z-index: 3;
+    }
+
+    .north-compass__needle-north,
+    .north-compass__needle-south {
+      position: absolute;
+      left: 50%;
+      width: 0;
+      height: 0;
+      transform: translateX(-50%);
+      filter:
+        drop-shadow(0.7px 0 0 #555550) drop-shadow(-0.7px 0 0 #555550) drop-shadow(0 0.7px 0 #555550) drop-shadow(0 -0.7px 0 #555550);
+    }
+
+    .north-compass__needle-north {
+      top: -2px;
+      border-right: 8px solid transparent;
+      border-bottom: 33px solid #c94b45;
+      border-left: 8px solid transparent;
+      filter:
+        drop-shadow(0.7px 0 0 #873632) drop-shadow(-0.7px 0 0 #873632) drop-shadow(0 0.7px 0 #873632) drop-shadow(0 -0.7px 0 #873632) drop-shadow(0 1px 2px rgba(135, 54, 50, 0.2));
+    }
+
+    .north-compass__needle-south {
+      bottom: -2px;
+      border-top: 33px solid #777773;
+      border-right: 8px solid transparent;
+      border-left: 8px solid transparent;
+      opacity: 1;
+    }
+
+    .north-compass__north-label {
+      position: absolute;
+      top: 17px;
+      left: 50%;
+      color: #f5e7dc;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1;
+      text-shadow: 0 1px 1px rgba(82, 25, 23, 0.7);
+      transform: translateX(-50%);
     }
 
     .esri-scale-bar__label {
@@ -428,9 +664,10 @@
     <section class="scene" data-scene="0">
       <p class="eyebrow">Athens, Georgia</p>
       <h1 class="main-title">Cyclist Survival Map</h1>
-      <p class="scene-body">A different way of seeing the city — one road at a time, from the saddle.</p>
-      <p class="scene-body">Scroll to explore.</p>
-      <span class="scroll-cue" aria-hidden="true"></span>
+      <p class="scene-body">Most maps are made for drivers. This one isn't.</p>
+      <p class="scene-body">What if roads were ranked by how safe they feel on a bike — not by how fast cars can move
+        through them? This map flips the hierarchy, and the familiar becomes strange.</p>
+
     </section>
 
     <!-- Scene 1 — Starting point: The map you already know -->
@@ -440,7 +677,7 @@
       <p class="scene-body">A conventional road map of Athens. Roads are ranked by traffic volume. Driveways dominate.
         Bike infrastructure is present but subdued — easy to miss and ignore.</p>
       <p class="scene-body">This is how most people see the city.</p>
-      <span class="scroll-cue" aria-hidden="true"></span>
+
     </section>
 
     <!-- Scene 2 — Inversion: A different measure -->
@@ -450,7 +687,7 @@
       <p class="scene-body">Flip the hierarchy. Roads are now rendered by how safe they feel on a bike — quiet,
         low-traffic streets glow brightest. Major driveways recede into darkness.</p>
       <p class="scene-body">The city rearranges itself.</p>
-      <span class="scroll-cue" aria-hidden="true"></span>
+
     </section>
 
     <!-- Scene 3 — Major corridor: Broad Street -->
@@ -461,7 +698,7 @@
         the west and continuing east toward Lexington Road.</p>
       <p class="scene-body">Essential for crossing the city, yet relentlessly hostile to cyclists. Highlighted in red
         — a caution, not a route.</p>
-      <span class="scroll-cue" aria-hidden="true"></span>
+
     </section>
 
     <!-- Scene 4 — River crossings: Two inaccessible bridges -->
@@ -471,7 +708,7 @@
       <p class="scene-body">The Middle Oconee River bisects the west side of Athens. Of the bridges that cross it, most
         lack safe accommodations for cyclists — nearly no shoulder, no shared path, high-speed traffic.</p>
       <p class="scene-body">Marked crossings are effectively inaccessible by bike.</p>
-      <span class="scroll-cue" aria-hidden="true"></span>
+
     </section>
 
     <!-- Scene 5 — Green spaces: Park connectors -->
@@ -482,7 +719,7 @@
         connecting trails, greenways, and quieter streets.</p>
       <p class="scene-body">But many others remain difficult to reach by bike, isolated by busy roads, missing
         connections, and abrupt gaps in safe routes.</p>
-      <span class="scroll-cue" aria-hidden="true"></span>
+
     </section>
 
     <!-- Scene 6 — Infrastructure: The bike network -->
@@ -493,7 +730,7 @@
         paths in gold, bike lanes in dashed lines.</p>
       <p class="scene-body">Coverage is real but uneven. Large areas of the city remain without any dedicated
         coverage.</p>
-      <span class="scroll-cue" aria-hidden="true"></span>
+
     </section>
 
     <!-- Scene 7 — Reading the map: What the map reveals -->
@@ -504,32 +741,37 @@
         breath. The contrast is not subtle — it is the everyday geography of risk.</p>
       <p class="scene-body">Urban cycling infrastructure is not just about convenience. It is about who gets to move
         freely, and who does not.</p>
-      <span class="scroll-cue" aria-hidden="true"></span>
+
     </section>
 
     <!-- Scene 8 — Comparison: Two maps, one city -->
     <section class="scene" data-scene="8">
       <p class="eyebrow">08 — Comparison</p>
       <h2 class="scene-head">Two maps, one city</h2>
-      <p class="scene-body">Drag the divider to compare. Left: the conventional car-centered map. Right: the cyclist's
-        survival map.</p>
-      <p class="scene-body">Same streets. Different stories.</p>
-      <span class="scroll-cue" aria-hidden="true"></span>
+      <p class="scene-body">Drag the divider to compare.</p>
+      <ul class="scene-list">
+        <li> <strong>Left</strong> — the conventional car-centered map. Roads ranked by traffic volume. Bike
+          infrastructure fades into the background.</li>
+        <li> <strong>Right</strong> — the cyclist's survival map. Quiet streets glow. Dangerous corridors recede into
+          darkness.</li>
+      </ul>
+      <p class="scene-body" style="margin-top:22px;">Same streets. Different stories.</p>
+
     </section>
 
     <!-- Scene 9 — Static edition: The shareable map -->
     <section class="scene" data-scene="9">
       <p class="eyebrow">09 — Static edition</p>
-      <h2 class="scene-head">The shareable map</h2>
-      <p class="scene-body">A print-ready version of the cyclist survival map, designed for posting, sharing, and
-        advocacy.</p>
+      <h2 class="scene-head">Where it began</h2>
+      <p class="scene-body">This storymap is built on a print map completed during 30-Day Map Challenge in 2025. It's a
+        static narrative designed for sharing and advocacy.</p>
       <a class="download-btn" href="image/bike_athens_full.png" download="bike_athens_map.png">Download full map ↓</a>
       <div class="metadata">
-        <p>Static Map Details: <a href="https://cartoguophy.com/maps/bike_athens.html" target="_blank"
+        <p>Static Map: <a href="https://cartoguophy.com/maps/bike_athens.html" target="_blank"
             rel="noopener noreferrer">cartoguophy.com/maps/bike_athens.html</a></p>
-        <p>Data Source: <a href="https://www.openstreetmap.org/" target="_blank"
-            rel="noopener noreferrer">OpenStreetMap</a> · <a href="https://data-athensclarke.opendata.arcgis.com/"
-            target="_blank" rel="noopener noreferrer">Athens-Clarke County Open Data</a></p>
+        <p>Source: <a href="https://www.openstreetmap.org/" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>
+          · <a href="https://data-athensclarke.opendata.arcgis.com/" target="_blank"
+            rel="noopener noreferrer">Athens-Clarke County Open Data</a></p>
         <p>Map Design: Atlas Guo (2025) · <a href="https://cartoguophy.com/" target="_blank"
             rel="noopener noreferrer">CartoGuophy.com</a></p>
 

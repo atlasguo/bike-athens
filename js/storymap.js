@@ -11,9 +11,8 @@ require([
   "esri/widgets/Swipe",
   "esri/widgets/Zoom",
   "esri/widgets/Home",
-  "esri/widgets/Compass",
   "esri/widgets/ScaleBar"
-], function (Map, MapView, GeoJSONLayer, GraphicsLayer, Graphic, SpatialReference, Swipe, Zoom, Home, Compass, ScaleBar) {
+], function (Map, MapView, GeoJSONLayer, GraphicsLayer, Graphic, SpatialReference, Swipe, Zoom, Home, ScaleBar) {
 
   var CFG = window.ATHENS_CONFIG;
   var V   = CFG.VIEW;
@@ -65,8 +64,36 @@ require([
   view.when(function () {
     var zoom     = new Zoom({ view: view });
     var home     = new Home({ view: view });
-    var compass  = new Compass({ view: view });
     var scaleBar = new ScaleBar({ view: view, unit: "imperial" });
+    var compass  = document.createElement("button");
+    var rotor    = document.createElement("span");
+
+    compass.className = "north-compass esri-widget esri-widget--button";
+    compass.type = "button";
+    compass.title = "Reset map to north";
+    compass.setAttribute("aria-label", "Reset map to north");
+    rotor.className = "north-compass__rotor";
+    rotor.setAttribute("aria-hidden", "true");
+    rotor.innerHTML =
+      '<span class="north-compass__wheel">' +
+        '<span class="north-compass__hub"></span>' +
+      '</span>' +
+      '<span class="north-compass__needle">' +
+        '<span class="north-compass__needle-north">' +
+          '<span class="north-compass__north-label">N</span>' +
+        '</span>' +
+        '<span class="north-compass__needle-south"></span>' +
+      '</span>';
+    compass.appendChild(rotor);
+
+    compass.addEventListener("click", function () {
+      view.goTo({ rotation: 0 });
+    });
+
+    view.watch("rotation", function (rotation) {
+      rotor.style.transform = "translate(-50%, -50%) rotate(" + rotation + "deg)";
+      compass.classList.toggle("is-rotated", Math.abs(rotation) > 0.1);
+    });
 
     view.ui.add(zoom,     { position: "top-left",  index: 0 });
     view.ui.add(home,     { position: "top-left",  index: 1 });
@@ -230,6 +257,7 @@ require([
   // Scene 0 — Athens, Georgia: Cyclist Survival Map
   function s0() {
     setNormal(); clearHL(); restoreOpacity(); restoreParks();
+    document.getElementById('viewDiv').classList.add('map-blurred');
     view.goTo(FULL, FLY_FAST);
   }
 
@@ -308,7 +336,7 @@ require([
       // X mark — signals "inaccessible"
       highlightLayer.add(new Graphic({ geometry: geo, symbol: { type: "simple-marker", style: "x",      color: [bridgeRed[0],bridgeRed[1],bridgeRed[2],0.95],  size: 11, outline: { color: [bridgeRed[0],bridgeRed[1],bridgeRed[2],0.95], width: 2 } } }));
     });
-    view.goTo({ center: [-83.413, 33.9435], scale: 22000 }, FLY);
+    view.goTo({ center: [-83.413, 33.936], scale: 22000 }, FLY);
   }
 
   // Scene 5 — Green spaces: Park connectors
@@ -391,8 +419,40 @@ require([
     var sceneEls = document.querySelectorAll('.scene');
     var dots     = document.querySelectorAll('.dot');
 
+    // Inject scroll hints into each scene
+    sceneEls.forEach(function (el, i) {
+      // Down hint — all scenes except last
+      if (i < sceneEls.length - 1) {
+        var hint = document.createElement('div');
+        hint.className = 'scene-scroll-hint';
+        hint.setAttribute('aria-hidden', 'true');
+        hint.innerHTML =
+          '<span class="scene-scroll-hint__text">' +
+            (i === 0 ? 'Scroll or click to view the storymap' : 'Scroll or click to continue') +
+          '</span>' +
+          '<span class="scene-scroll-hint__cue"></span>';
+        hint.style.cursor = 'pointer';
+        hint.addEventListener('click', function () {
+          sceneEls[i + 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+        el.appendChild(hint);
+      }
+      // Up hint — all scenes except first
+      if (i > 0) {
+        var up = document.createElement('div');
+        up.className = 'scene-scroll-up';
+        up.setAttribute('aria-hidden', 'true');
+        up.innerHTML = '<span class="scene-scroll-up__cue"></span>';
+        up.addEventListener('click', function () {
+          sceneEls[i - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+        el.appendChild(up);
+      }
+    });
+
     function activate(id) {
       activeActivationId += 1;
+      if (id !== 0) document.getElementById('viewDiv').classList.remove('map-blurred');
       if (id !== 9) hideStaticOverlay();
       if (SCENE_FNS[id]) SCENE_FNS[id](activeActivationId);
       dots.forEach(function (d, i) { d.classList.toggle('active', i === id); });
